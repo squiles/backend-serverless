@@ -1,0 +1,21 @@
+service: backend-serverless
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 4000
+
+functions:
+  api:
+    handler: src/app.handler
+    events:
+      - httpApi:
+          path: /
+          method: get
