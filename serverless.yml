@@ -1,5 +1,7 @@
-service: backend-serverless
+service: backendServerless
 frameworkVersion: "3"
+
+useDotenv: true
 
 provider:
   name: aws
@@ -10,7 +12,8 @@ plugins:
 
 custom:
   serverless-offline:
-    httpPort: 4000
+    httpPort: ${env:PORT}
+    lambdaPort: ${env:LAMBDA_PORT}
 
 functions:
   api:
