@@ -8,13 +8,23 @@ provider:
   runtime: nodejs18.x
 
 plugins:
-  - serverless-plugin-typescript
+  # Serverless-webpack to transform typescript into js and to allow us to manage what
+  # gets added to the lambda function or not
+  - serverless-webpack
+  # Serverless-offline to emulate the lambda and api gateway setup locally and
+  # allow development and testing without internet. Pairs nicelly with serverless-webpack
   - serverless-offline
 
 custom:
   serverless-offline:
     httpPort: ${env:PORT}
     lambdaPort: ${env:LAMBDA_PORT}
+
+  webpack:
+    webpackConfig: "webpack.config.js" # Name of webpack configuration file
+    includeModules: false # Node modules configuration for packaging
+    packager: "pnpm" # Packager that will be used to package your external modules
+    excludeFiles: ./**/*.test.ts # Provide a glob for files to ignore
 
 functions:
   api:
@@ -23,3 +33,19 @@ functions:
       - httpApi:
           path: /
           method: get
+
+# Optional deployment packaging configuration
+package:
+  # Directories and files to include in the deployed package
+  patterns:
+    - src/**
+    - "!.git/**"
+    - "!.travis.yml"
+    - "!.prisma/**"
+    - "!.tests/**"
+  # Package each function as an individual artifact (default: false)
+  individually: true
+  # Explicitly set the package artifact to deploy (overrides native packaging behavior)
+  # artifact: path/to/my-artifact.zip
+  # Automatically exclude NPM dev dependencies from the deployed package (default: true)
+  excludeDevDependencies: true
